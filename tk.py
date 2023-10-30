@@ -1,36 +1,32 @@
+from tkinter import *
 import cv2
-import sys
 import numpy as np
 import wyzecam
-from PyQt5.QtWidgets import QMainWindow, QLabel, QToolBar, QAction, QApplication, QVBoxLayout
-from PyQt5.QtGui import QPixmap
 import math
 
-
-class App(QMainWindow):
-    def __init__(self):
-        super().__init__()
+class App(Frame):
+    def __init__(self, master):
+        super().__init__(master)
         self.initUI()
 
     def initUI(self):
-        self.label = QLabel(self)
-        self.setCentralWidget(self.label)
+        self.label = Label(self)
+        self.pack()
 
         # Crea una barra de herramientas
-        self.toolbar = self.addToolBar("Toolbar")
+        self.toolbar = Frame(self)
+        self.toolbar.pack(side="top")
 
         # Crea un botón para iniciar la detección de movimiento
-        self.action_start = QAction("Iniciar", self)
-        self.action_start.triggered.connect(self.start_detection)
-        self.toolbar.addAction(self.action_start)
+        self.button_start = Button(self.toolbar, text="Iniciar", command=self.start_detection)
+        self.button_start.pack(side="left")
 
         # Crea un botón para detener la detección de movimiento
-        self.action_stop = QAction("Detener", self)
-        self.action_stop.triggered.connect(self.stop_detection)
-        self.toolbar.addAction(self.action_stop)
+        self.button_stop = Button(self.toolbar, text="Detener", command=self.stop_detection)
+        self.button_stop.pack(side="left")
 
         # Muestra la ventana
-        self.show()
+        self.mainloop()
 
     def start_detection(self):
         # Inicia la detección de movimiento
@@ -67,8 +63,7 @@ class App(QMainWindow):
                 cv2.circle(frame, (x, y), radius, (0, 255, 0), 2)
 
             # Muestra el marco en la etiqueta
-            self.label.setPixmap(QPixmap.fromImage(
-                cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
+            self.label.configure(image=PhotoImage(image=cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
 
             # Si los ojos están abiertos, muestra una notificación
             if is_open:
@@ -80,6 +75,6 @@ class App(QMainWindow):
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    ex = App()
-    sys.exit(app.exec_())
+    root = Tk()
+    app = App(root)
+    root.mainloop()
